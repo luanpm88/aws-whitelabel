@@ -13,6 +13,6 @@
 
 Route::group(['middleware' => ['web'], 'namespace' => 'Acelle\AwsWhitelabel\Controllers'], function() {
     // White label setting page
-    Route::get('/aws-whitelabel', 'PAwsWhitelabelController@index');
+    Route::match(['get', 'post'], '/aws-whitelabel', 'AwsWhitelabelController@index');
     
 });

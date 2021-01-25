@@ -13,6 +13,13 @@ class AwsWhitelabelController extends Controller
      * @return string
      **/
     public function index(Request $request) {
-        
+        if ($request->isMethod('post')) {
+            // Redirect to my lists page
+            $request->session()->flash('alert-success', trans('awswhitelabel::messages.plugin.setting.updated'));
+        }
+
+        return view('awswhitelabel::index', [
+            'plugin' => \Acelle\Model\Plugin::getByName('aws_whitelabel'),
+        ]);
     }
 }

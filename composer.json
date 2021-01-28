@@ -1,8 +1,7 @@
 {
     "name": "acelle/aws-whitelabel",
-    "description": "AWS whitelabel.",
-    "keywords": ["laravel", "aws", "whitelabel"],
-    "license": "MIT",
+    "title": "AWS Whitelabel Plugin For Acelle"
+    "description": "Remove AWS brand in your Acelle application",
     "authors": [
         {
             "name": "Basic Technology Software Co., Ltd.",
@@ -12,11 +11,6 @@
     "autoload": {
         "psr-4": {
             "Acelle\\Plugin\\AwsWhitelabel\\": "src/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Acelle\\Plugin\\AwsWhitelabel\\Tests\\": "tests/"
         }
     },
     "extra": {

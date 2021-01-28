@@ -1,6 +1,6 @@
 <?php
 
-namespace Acelle\AwsWhitelabel\Controllers;
+namespace Acelle\Plugin\AwsWhitelabel\Controllers;
 
 use Acelle\Http\Controllers\Controller;
 use Illuminate\Http\Request;

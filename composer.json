@@ -1,6 +1,6 @@
 {
     "name": "acelle/aws-whitelabel",
-    "title": "AWS Whitelabel Plugin For Acelle"
+    "title": "AWS Whitelabel Plugin For Acelle",
     "description": "Remove AWS brand in your Acelle application",
     "authors": [
         {

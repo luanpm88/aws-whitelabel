@@ -5,16 +5,16 @@ namespace Acelle\Plugin\AwsWhitelabel;
 use Acelle\Model\Plugin as PluginModel;
 use Aws\Route53\Route53Client;
 use Aws\Route53Domains\Route53DomainsClient;
+use Acelle\Library\Facades\Plugin;
 
 class Main
 {
-    const ID = 'aws_whitelabel';
-
+    const NAME = 'acelle/aws-whitelabel';
     protected $data;
 
     public function __construct()
     {
-        $name = self::ID;
+        $name = self::NAME;
         $record = PluginModel::where('name', $name)->first();
         if (is_null($record)) {
             throw new \Exception("Plugin record for '{$name}' not found");
@@ -22,9 +22,17 @@ class Main
         $this->data = $record->getData();
     }
 
-    public function getId()
+    public function registerHooks()
     {
-        return self::ID;
+        // Register hooks
+        Plugin::registerHook('filter_aws_ses_dns_records', function(&$identity, &$dkims, &$spf) {
+            $this->removeAmazonSesBrand($identity, $dkims, $spf);
+        });
+
+        // Register hooks
+        Plugin::registerHook('generate_plugin_setting_url_for_'.self::NAME, function(&$url) {
+            $url = action('\Acelle\Plugin\AwsWhitelabel\Controllers\MainController@index');
+        }); 
     }
 
     public function removeAmazonSesBrand(&$identity, &$dkims, &$spf)

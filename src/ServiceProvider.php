@@ -18,18 +18,15 @@ class ServiceProvider extends Base
         // Get the Plugin Main object
         $main = new Main();
 
-        // Simply exit if this plugin is not activated yet
-        if (!Plugin::active($main->getId())) {
-            return;
-        }
-
-        // Register hooks
-        Plugin::registerHook('filter_aws_ses_dns_records', function(&$identity, &$dkims, &$spf) use ($main) {
-            $main->removeAmazonSesBrand($identity, $dkims, $spf);
-        });
+        $main->registerHooks();
 
         /* 
+
+        // The following is executed after
+        // Plugin::load('acelle/aws-whitelabel')
+
         // Test hook execution
+        echo 'booted';
         $identity = 1;
         $dkims = [['value' => 'u83973948392438.dkim.amazonses.com']];
         $spf = 1343;

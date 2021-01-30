@@ -5,7 +5,7 @@ namespace Acelle\Plugin\AwsWhitelabel\Controllers;
 use Acelle\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class AwsWhitelabelController extends Controller
+class MainController extends Controller
 {
     /**
      * Whitelabel setting page.
@@ -19,7 +19,7 @@ class AwsWhitelabelController extends Controller
         }
 
         return view('awswhitelabel::index', [
-            'plugin' => \Acelle\Model\Plugin::getByName('aws_whitelabel'),
+            'plugin' => \Acelle\Model\Plugin::getByName('acelle/aws-whitelabel'),
         ]);
     }
 }

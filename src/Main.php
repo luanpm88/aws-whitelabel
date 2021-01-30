@@ -33,6 +33,11 @@ class Main
         Plugin::registerHook('generate_plugin_setting_url_for_'.self::NAME, function(&$url) {
             $url = action('\Acelle\Plugin\AwsWhitelabel\Controllers\MainController@index');
         }); 
+
+        // Register hooks
+        Plugin::registerHook('generate_big_notice_for_sending_server', function($server) {
+            return "<strong> This is {$server->name} </strong>";
+        }); 
     }
 
     public function removeAmazonSesBrand(&$identity, &$dkims, &$spf)

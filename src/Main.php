@@ -32,12 +32,24 @@ class Main
         // Register hooks
         Plugin::registerHook('generate_plugin_setting_url_for_'.self::NAME, function(&$url) {
             $url = action('\Acelle\Plugin\AwsWhitelabel\Controllers\MainController@index');
-        }); 
+        });
 
         // Register hooks
         Plugin::registerHook('generate_big_notice_for_sending_server', function($server) {
             return "<strong> This is {$server->name} </strong>";
-        }); 
+        });
+
+        Plugin::registerHook('activate_plugin_'.self::NAME, function() {
+            return true; // or throw an exception
+        });
+
+        Plugin::registerHook('deactivate_plugin_'.self::NAME, function() {
+            return true; // or throw an exception
+        });
+
+        Plugin::registerHook('delete_plugin_'.self::NAME, function() {
+            return true; // or throw an exception
+        });
     }
 
     public function removeAmazonSesBrand(&$identity, &$dkims, &$spf)

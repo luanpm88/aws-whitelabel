@@ -20,7 +20,7 @@ class ServiceProvider extends Base
 
         $main->registerHooks();
 
-        /* 
+        /*
 
         // The following is executed after
         // Plugin::load('acelle/aws-whitelabel')
@@ -66,6 +66,5 @@ class ServiceProvider extends Base
      */
     public function register()
     {
-
     }
 }

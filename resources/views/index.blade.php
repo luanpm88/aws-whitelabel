@@ -38,7 +38,7 @@
     
     <div class="row">
         <div class="col-md-6">
-            <form method="POST" action="">
+            <form method="POST" action="{{ action('\Acelle\Plugin\AwsWhitelabel\Controllers\MainController@save') }}">
                 {{ csrf_field() }}
                 <p>
                     {{ trans('awswhitelabel::messages.whitelabel.choose_brand.wording') }}
@@ -48,17 +48,29 @@
                         @include('helpers.form_control', [
                             'type' => 'text',
                             'class' => '',
-                            'label' => '',
-                            'name' => 'brand',
-                            'value' => 'Amazon Route S3',
-                            'disabled' => true,
-                            'help_class' => 'whitelabel',
-                            'rules' => ['brand' => 'required']
+                            'label' => 'AWS key',
+                            'name' => 'aws_key',
+                            'value' => $data['aws_key'],
+                            'help_class' => 'aws_key',
+                            'rules' => ['aws_key' => 'required']
+                        ])
+                    </div>
+                </div>
+                <div class="row mb-4">
+                    <div class="col-md-12 pr-0 form-groups-bottom-0">
+                        @include('helpers.form_control', [
+                            'type' => 'text',
+                            'class' => '',
+                            'label' => 'AWS secret',
+                            'name' => 'aws_secret',
+                            'value' => $data['aws_secret'],
+                            'help_class' => 'aws_secret',
+                            'rules' => ['aws_secret' => 'required']
                         ])
                     </div>
                 </div>
                 <div class=" mt-4">
-                    <button class="btn btn-mc_primary mr-3 whitelabel-save">{{ trans('messages.save') }}</button>
+                    <input type="submit" value="Connect & Activate">
                     <a href="{{ action('Admin\PluginController@index') }}" class="btn btn-link" style="color: #333">{{ trans('messages.cancel') }}</a>
                 </div>
             </form>

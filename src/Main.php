@@ -14,12 +14,12 @@ class Main
 
     public function __construct()
     {
-        $name = self::NAME;
-        $record = PluginModel::where('name', $name)->first();
-        if (is_null($record)) {
-            throw new \Exception("Plugin record for '{$name}' not found");
-        }
-        $this->data = $record->getData();
+        //
+    }
+
+    public function getDbRecord()
+    {
+        return PluginModel::where('name', self::NAME)->first();
     }
 
     public function registerHooks()
@@ -40,7 +40,8 @@ class Main
         });
 
         Plugin::registerHook('activate_plugin_'.self::NAME, function () {
-            return true; // or throw an exception
+            // execute ListHostedZones as a test
+            // $this->getRoute53Domains();
         });
 
         Plugin::registerHook('deactivate_plugin_'.self::NAME, function () {
@@ -71,12 +72,13 @@ class Main
         }
     }
 
-    public function getRoute53Client($server)
+    public function getRoute53Client()
     {
+        $data = $this->getDbRecord()->getData();
         $client = Route53Client::factory(array(
             'credentials' => array(
-                'key' => trim($server->aws_access_key_id),
-                'secret' => trim($server->aws_secret_access_key),
+                'key' => $data['aws_key'],
+                'secret' => $data['aws_secret'],
             ),
             'region' => 'us-east-1',
             'version' => '2013-04-01',
@@ -132,9 +134,9 @@ class Main
         return $result;
     }
 
-    public function getRoute53Domains($server)
+    public function getRoute53Domains()
     {
-        $results = $this->getRoute53Client($server)->listHostedZones();
+        $results = $this->getRoute53Client()->listHostedZones();
         
         if (!isset($results['HostedZones'])) {
             return [];
@@ -149,5 +151,16 @@ class Main
         },
             $results['HostedZones']
         );
+    }
+
+    public function connectAndActivate($keyId, $secret)
+    {
+        $record = $this->getDbRecord();
+        $record->updateData([
+            'aws_key' => $keyId,
+            'aws_secret' => $secret,
+        ]);
+
+        $record->activate();
     }
 }

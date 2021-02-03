@@ -5,7 +5,7 @@ namespace Acelle\Plugin\AwsWhitelabel;
 use Acelle\Model\Plugin as PluginModel;
 use Aws\Route53\Route53Client;
 use Aws\Route53Domains\Route53DomainsClient;
-use Acelle\Library\Facades\Plugin;
+use Acelle\Library\Facades\Hook;
 
 class Main
 {
@@ -25,30 +25,25 @@ class Main
     public function registerHooks()
     {
         // Register hooks
-        Plugin::registerHook('filter_aws_ses_dns_records', function (&$identity, &$dkims, &$spf) {
+        Hook::register('filter_aws_ses_dns_records', function (&$identity, &$dkims, &$spf) {
             $this->removeAmazonSesBrand($identity, $dkims, $spf);
         });
 
         // Register hooks
-        Plugin::registerHook('generate_plugin_setting_url_for_'.self::NAME, function (&$url) {
-            $url = action('\Acelle\Plugin\AwsWhitelabel\Controllers\MainController@index');
-        });
-
-        // Register hooks
-        Plugin::registerHook('generate_big_notice_for_sending_server', function ($server) {
+        Hook::register('generate_big_notice_for_sending_server', function ($server) {
             return "<strong> This is {$server->name} </strong>";
         });
 
-        Plugin::registerHook('activate_plugin_'.self::NAME, function () {
+        // Hook::register('activate_plugin_'.self::NAME, function () {
             // execute ListHostedZones as a test
             // $this->getRoute53Domains();
-        });
+        // });
 
-        Plugin::registerHook('deactivate_plugin_'.self::NAME, function () {
+        Hook::register('deactivate_plugin_'.self::NAME, function () {
             return true; // or throw an exception
         });
 
-        Plugin::registerHook('delete_plugin_'.self::NAME, function () {
+        Hook::register('delete_plugin_'.self::NAME, function () {
             return true; // or throw an exception
         });
     }

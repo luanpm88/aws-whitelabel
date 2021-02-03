@@ -18,7 +18,8 @@
             "providers": [
                 "Acelle\\Plugin\\AwsWhitelabel\\ServiceProvider"
             ]
-        }
+        },
+        "setting-route": "\\Acelle\\Plugin\\AwsWhitelabel\\Controllers\\MainController@index"
     },
     "minimum-stability": "dev",
     "prefer-stable": true

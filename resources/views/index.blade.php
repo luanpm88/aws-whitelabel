@@ -50,7 +50,7 @@
                             'class' => '',
                             'label' => 'AWS key',
                             'name' => 'aws_key',
-                            'value' => $data['aws_key'],
+                            'value' => isset($data['aws_key']) ? $data['aws_key'] : null,
                             'help_class' => 'aws_key',
                             'rules' => ['aws_key' => 'required']
                         ])
@@ -63,7 +63,7 @@
                             'class' => '',
                             'label' => 'AWS secret',
                             'name' => 'aws_secret',
-                            'value' => $data['aws_secret'],
+                            'value' => isset($data['aws_secret']) ? $data['aws_secret'] : null,
                             'help_class' => 'aws_secret',
                             'rules' => ['aws_secret' => 'required']
                         ])

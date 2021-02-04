@@ -31,7 +31,9 @@ class Main
 
         // Register hooks
         Hook::register('generate_big_notice_for_sending_server', function ($server) {
-            return "<strong> This is {$server->name} </strong>";
+            return view('awswhitelabel::notification', [
+                'server' => $server,
+            ]);
         });
 
         // Hook::register('activate_plugin_'.self::NAME, function () {

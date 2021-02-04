@@ -15,4 +15,9 @@ Route::group(['middleware' => ['web'], 'namespace' => '\Acelle\Plugin\AwsWhitela
     // White label setting page
     Route::match(['get'], '/aws-whitelabel', 'MainController@index');
     Route::match(['post'], '/aws-whitelabel/save', 'MainController@save');
+
+    // setting
+    Route::get('aws-whitelabel/{uid}/popup', 'MainController@popup');
+    Route::match(['get', 'post'], 'aws-whitelabel/{uid}/connection', 'MainController@connection');
+    Route::post('aws-whitelabel/{uid}/turn-off', 'MainController@turnOff');
 });

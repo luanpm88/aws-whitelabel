@@ -3,7 +3,6 @@
 namespace Acelle\Plugin\AwsWhitelabel;
 
 use Illuminate\Support\ServiceProvider as Base;
-use Acelle\Library\Facades\Plugin;
 use Acelle\Plugin\AwsWhitelabel\Main;
 
 class ServiceProvider extends Base

@@ -37,8 +37,8 @@ class Main
         });
 
         // Hook::register('activate_plugin_'.self::NAME, function () {
-            // execute ListHostedZones as a test
-            // $this->getRoute53Domains();
+        // execute ListHostedZones as a test
+        // $this->getRoute53Domains();
         // });
 
         Hook::register('deactivate_plugin_'.self::NAME, function () {
@@ -141,11 +141,11 @@ class Main
 
         return array_map(
             function ($e) {
-            return [
+                return [
                     'id' => str_replace('/hostedzone/', '', $e['Id']),
                     'name' => $e['Name']
                 ];
-        },
+            },
             $results['HostedZones']
         );
     }

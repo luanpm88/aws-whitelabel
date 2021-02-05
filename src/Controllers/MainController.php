@@ -27,8 +27,7 @@ class MainController extends Controller
 
     public function save(Request $request)
     {
-
-        $validator = \Validator::make($request->all(),[
+        $validator = \Validator::make($request->all(), [
             'aws_key' => 'required',
             'aws_secret' => 'required',
         ]);

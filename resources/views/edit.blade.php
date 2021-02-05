@@ -38,7 +38,7 @@
     
     <div class="row">
         <div class="col-md-6">
-            <form method="POST" action="{{ action('\Acelle\Plugin\AwsWhitelabel\Controllers\MainController@activate') }}">
+            <form method="POST" action="{{ action('\Acelle\Plugin\AwsWhitelabel\Controllers\MainController@saveKey') }}">
                 {{ csrf_field() }}
                 <p>
                     {{ trans('awswhitelabel::messages.whitelabel.choose_brand.wording') }}
@@ -69,17 +69,10 @@
                         ])
                     </div>
                 </div>
-                <div class="row mb-4">
-                    <div class="col-md-12 pr-0 form-groups-bottom-0">
-                        <p>{{ $data['domain'] }} | Zone: {{ $data['zone'] }}</p>
-                    </div>
-                </div>
-                <div class="">
-                    @if (!$plugin->isActive())
-                    <input type="submit" value="Activate">
-                    @endif
-                    <a href="{{ action('\Acelle\Plugin\AwsWhitelabel\Controllers\MainController@editKey') }}" class="btn btn-link" style="color: #333">Change key</a>
-                    <a href="{{ action('\Acelle\Plugin\AwsWhitelabel\Controllers\MainController@selectDomain') }}" class="btn btn-link" style="color: #333">Change domain</a>
+
+                <div class=" mt-4">
+                    <input type="submit" value="Connect & Activate">
+                    <a href="{{ action('Admin\PluginController@index') }}" class="btn btn-link" style="color: #333">{{ trans('messages.cancel') }}</a>
                 </div>
             </form>
         </div>

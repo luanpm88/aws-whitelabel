@@ -72,10 +72,17 @@ class Main
     public function getRoute53Client()
     {
         $data = $this->getDbRecord()->getData();
+        $client = self::initRoute53Client($data['aws_key'], $data['aws_secret']);
+
+        return $client;
+    }
+
+    public static function initRoute53Client($key, $secret)
+    {
         $client = Route53Client::factory(array(
             'credentials' => array(
-                'key' => $data['aws_key'],
-                'secret' => $data['aws_secret'],
+                'key' => $key,
+                'secret' => $secret,
             ),
             'region' => 'us-east-1',
             'version' => '2013-04-01',
@@ -141,23 +148,51 @@ class Main
 
         return array_map(
             function ($e) {
+                $hostedZone = str_replace('/hostedzone/', '', $e['Id']);
+                $name = $e['Name'];
                 return [
-                    'id' => str_replace('/hostedzone/', '', $e['Id']),
-                    'name' => $e['Name']
+                    'zone' => $hostedZone,
+                    'name' => $name,
                 ];
             },
             $results['HostedZones']
         );
     }
 
+    public function testRoute53Connection($keyId, $secret)
+    {
+        $client = self::initRoute53Client($keyId, $secret);
+        $client->listHostedZones();
+    }
+
     public function connectAndActivate($keyId, $secret)
     {
+        // Test or throw exception
+        $this->testRoute53Connection($keyId, $secret);
+
+        // Test OK, proceed
         $record = $this->getDbRecord();
         $record->updateData([
             'aws_key' => $keyId,
             'aws_secret' => $secret,
         ]);
 
+        $record->activate();
+    }
+
+    public function updateDomain($domainAndZone)
+    {
+        list($domain, $zone) = explode('|', $domainAndZone);
+        $record = $this->getDbRecord();
+        $record->updateData([
+            'domain' => $domain,
+            'zone' => $zone,
+        ]);
+    }
+
+    public function activate()
+    {
+        $record = $this->getDbRecord();
         $record->activate();
     }
 }

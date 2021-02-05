@@ -19,13 +19,47 @@ class MainController extends Controller
         $main = new Main();
         $record = $main->getDbRecord();
         $data = $record->getData();
+
+        if (!array_key_exists('aws_key', $data) || !array_key_exists('aws_secret', $data)) {
+            return redirect()->action('\Acelle\Http\Controllers\Controller\MainController@editKey');
+        }
+
+        if (!array_key_exists('zone', $data) || !array_key_exists('domain', $data)) {
+            return redirect()->action('\Acelle\Http\Controllers\Controller\MainController@selectDomain');
+        }
+
         return view('awswhitelabel::index', [
             'plugin' => $record,
             'data' => $data,
         ]);
     }
 
-    public function save(Request $request)
+    public function editKey(Request $request)
+    {
+        $main = new Main();
+        $record = $main->getDbRecord();
+        $data = $record->getData();
+
+        return view('awswhitelabel::edit', [
+            'plugin' => $record,
+            'data' => $data,
+        ]);
+    }
+
+    public function selectDomain(Request $request)
+    {
+        $main = new Main();
+        $record = $main->getDbRecord();
+        $data = $record->getData();
+        $domains = $main->getRoute53Domains();
+        return view('awswhitelabel::select', [
+            'plugin' => $record,
+            'data' => $data,
+            'domains' => $domains,
+        ]);
+    }
+
+    public function saveKey(Request $request)
     {
         $validator = \Validator::make($request->all(), [
             'aws_key' => 'required',
@@ -36,14 +70,43 @@ class MainController extends Controller
         if ($validator->fails()) {
             $error = print_r(array_values($validator->errors()->toArray()), true);
             $request->session()->flash('alert-error', $error);
-            return redirect()->action('\Acelle\Plugin\AwsWhitelabel\Controllers\MainController@index');
+            return redirect()->action('\Acelle\Plugin\AwsWhitelabel\Controllers\MainController@editKey');
         }
 
         $main = new Main();
         $main->connectAndActivate($request->input('aws_key'), $request->input('aws_secret'));
 
-        $request->session()->flash('alert-success', "Plugin Activated");
-        return redirect()->action('Admin\PluginController@index');
+        $request->session()->flash('alert-success', "Domain selected");
+        return redirect()->action('\Acelle\Plugin\AwsWhitelabel\Controllers\MainController@selectDomain');
+    }
+
+    public function saveDomain(Request $request)
+    {
+        $validator = \Validator::make($request->all(), [
+            'domain' => 'required',
+        ]);
+            
+        // redirect if fails
+        if ($validator->fails()) {
+            $error = print_r(array_values($validator->errors()->toArray()), true);
+            $request->session()->flash('alert-error', $error);
+            return redirect()->action('\Acelle\Plugin\AwsWhitelabel\Controllers\MainController@selectDomain');
+        }
+
+        $main = new Main();
+        $main->updateDomain($request->input('domain'));
+
+        $request->session()->flash('alert-success', "Domain selected");
+        return redirect()->action('\Acelle\Plugin\AwsWhitelabel\Controllers\MainController@index');
+    }
+
+    public function activate(Request $request)
+    {
+        $main = new Main();
+        $main->activate();
+
+        $request->session()->flash('alert-success', "Plugin activated!");
+        return redirect()->action('\Acelle\Plugin\AwsWhitelabel\Controllers\MainController@index');
     }
 
     /**

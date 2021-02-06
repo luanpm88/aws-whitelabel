@@ -84,7 +84,6 @@
 
                 <div class=" mt-4">
                     <input type="submit" value="Save">
-                    <a href="{{ action('Admin\PluginController@index') }}" class="btn btn-link" style="color: #333">{{ trans('messages.cancel') }}</a>
                 </div>
             </form>
         </div>

@@ -71,8 +71,8 @@
                 </div>
 
                 <div class=" mt-4">
-                    <input type="submit" value="Connect & Activate">
-                    <a href="{{ action('Admin\PluginController@index') }}" class="btn btn-link" style="color: #333">{{ trans('messages.cancel') }}</a>
+                    <input type="submit" value="Save & Connect">
+                    <a href="{{ action('Admin\PluginController@index') }}" class="btn btn-link" style="color: #333">Back to Plugins</a>
                 </div>
             </form>
         </div>

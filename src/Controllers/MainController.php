@@ -21,11 +21,11 @@ class MainController extends Controller
         $data = $record->getData();
 
         if (!array_key_exists('aws_key', $data) || !array_key_exists('aws_secret', $data)) {
-            return redirect()->action('\Acelle\Http\Controllers\Controller\MainController@editKey');
+            return redirect()->action('\Acelle\Plugin\AwsWhitelabel\Controllers\MainController@editKey');
         }
 
         if (!array_key_exists('zone', $data) || !array_key_exists('domain', $data)) {
-            return redirect()->action('\Acelle\Http\Controllers\Controller\MainController@selectDomain');
+            return redirect()->action('\Acelle\Plugin\AwsWhitelabel\Controllers\MainController@selectDomain');
         }
 
         return view('awswhitelabel::index', [
@@ -44,6 +44,15 @@ class MainController extends Controller
             'plugin' => $record,
             'data' => $data,
         ]);
+    }
+
+    public function reset(Request $request)
+    {
+        $main = new Main();
+        $record = $main->getDbRecord();
+        $record->reset();
+
+        return redirect()->action('\Acelle\Plugin\AwsWhitelabel\Controllers\MainController@editKey');
     }
 
     public function selectDomain(Request $request)
@@ -74,9 +83,14 @@ class MainController extends Controller
         }
 
         $main = new Main();
-        $main->connectAndActivate($request->input('aws_key'), $request->input('aws_secret'));
+        try {
+            $main->connectAndSave($request->input('aws_key'), $request->input('aws_secret'));    
+        } catch (\Exception $ex) {
+            $request->session()->flash('alert-error', 'Cannot connect to AWS Route53. Error: '.$ex->getMessage());
+            return redirect()->action('\Acelle\Plugin\AwsWhitelabel\Controllers\MainController@editKey');
+        }
 
-        $request->session()->flash('alert-success', "Domain selected");
+        $request->session()->flash('alert-success', "Connected to AWS Route53");
         return redirect()->action('\Acelle\Plugin\AwsWhitelabel\Controllers\MainController@selectDomain');
     }
 

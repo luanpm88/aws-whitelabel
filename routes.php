@@ -18,7 +18,8 @@ Route::group(['middleware' => ['web'], 'namespace' => '\Acelle\Plugin\AwsWhitela
     Route::match(['get'], '/aws-whitelabel/select-domain', 'MainController@selectDomain');
     Route::match(['post'], '/aws-whitelabel/save-key', 'MainController@saveKey');
     Route::match(['post'], '/aws-whitelabel/save-domain', 'MainController@saveDomain');
-    Route::match(['post'], '/aws-whitelabel/save-domain', 'MainController@activate');
+    Route::match(['post'], '/aws-whitelabel/activate', 'MainController@activate');
+    Route::match(['post'], '/aws-whitelabel/reset', 'MainController@reset');
 
     // setting
     Route::get('aws-whitelabel/{uid}/popup', 'MainController@popup');

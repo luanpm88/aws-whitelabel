@@ -36,10 +36,10 @@ class Main
             ]);
         });
 
-        // Hook::register('activate_plugin_'.self::NAME, function () {
-        // execute ListHostedZones as a test
-        // $this->getRoute53Domains();
-        // });
+        Hook::register('activate_plugin_'.self::NAME, function () {
+            // Run this method as a test
+            $this->getRoute53Domains();
+        });
 
         Hook::register('deactivate_plugin_'.self::NAME, function () {
             return true; // or throw an exception
@@ -72,6 +72,11 @@ class Main
     public function getRoute53Client()
     {
         $data = $this->getDbRecord()->getData();
+
+        if (!array_key_exists('aws_key', $data) || !array_key_exists('aws_secret', $data)) {
+            throw new \Exception('Plugin AWS Whitelabel not configured yet');
+        }
+
         $client = self::initRoute53Client($data['aws_key'], $data['aws_secret']);
 
         return $client;
@@ -165,7 +170,7 @@ class Main
         $client->listHostedZones();
     }
 
-    public function connectAndActivate($keyId, $secret)
+    public function connectAndSave($keyId, $secret)
     {
         // Test or throw exception
         $this->testRoute53Connection($keyId, $secret);
@@ -176,8 +181,6 @@ class Main
             'aws_key' => $keyId,
             'aws_secret' => $secret,
         ]);
-
-        $record->activate();
     }
 
     public function updateDomain($domainAndZone)

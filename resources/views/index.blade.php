@@ -38,8 +38,9 @@
     
     <div class="row">
         <div class="col-md-6">
-            <form method="POST" action="{{ action('\Acelle\Plugin\AwsWhitelabel\Controllers\MainController@activate') }}">
-                {{ csrf_field() }}
+            <form style="float:left" method="POST">
+                @csrf
+
                 <p>
                     {{ trans('awswhitelabel::messages.whitelabel.choose_brand.wording') }}
                 </p>
@@ -49,6 +50,7 @@
                             'type' => 'text',
                             'class' => '',
                             'label' => 'AWS key',
+                            'disabled' => true,
                             'name' => 'aws_key',
                             'value' => isset($data['aws_key']) ? $data['aws_key'] : null,
                             'help_class' => 'aws_key',
@@ -62,6 +64,7 @@
                             'type' => 'text',
                             'class' => '',
                             'label' => 'AWS secret',
+                            'disabled' => true,
                             'name' => 'aws_secret',
                             'value' => isset($data['aws_secret']) ? $data['aws_secret'] : null,
                             'help_class' => 'aws_secret',
@@ -71,17 +74,21 @@
                 </div>
                 <div class="row mb-4">
                     <div class="col-md-12 pr-0 form-groups-bottom-0">
-                        <p>{{ $data['domain'] }} | Zone: {{ $data['zone'] }}</p>
+                        <p>{{ $data['domain'] }} | Zone: {{ $data['zone'] }} <a href="{{ action('\Acelle\Plugin\AwsWhitelabel\Controllers\MainController@selectDomain') }}" class="btn btn-link" style="color: #333">+ Change domain</a></p>
                     </div>
                 </div>
                 <div class="">
                     @if (!$plugin->isActive())
-                    <input type="submit" value="Activate">
+                    
+                        <input type="submit" formaction="{{ action('\Acelle\Plugin\AwsWhitelabel\Controllers\MainController@activate') }}" value="Activate">
+                    
                     @endif
-                    <a href="{{ action('\Acelle\Plugin\AwsWhitelabel\Controllers\MainController@editKey') }}" class="btn btn-link" style="color: #333">Change key</a>
-                    <a href="{{ action('\Acelle\Plugin\AwsWhitelabel\Controllers\MainController@selectDomain') }}" class="btn btn-link" style="color: #333">Change domain</a>
+                    
+                    <input type="submit" formaction="{{ action('\Acelle\Plugin\AwsWhitelabel\Controllers\MainController@reset') }}" value="Reset Connection">
+                    
+                    
                 </div>
-            </form>
+            
         </div>
     </div>
 @endsection

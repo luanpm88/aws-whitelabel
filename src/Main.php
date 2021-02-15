@@ -6,15 +6,33 @@ use Acelle\Model\Plugin as PluginModel;
 use Aws\Route53\Route53Client;
 use Aws\Route53Domains\Route53DomainsClient;
 use Acelle\Library\Facades\Hook;
+use Carbon\Carbon;
+use Monolog\Logger;
+use Monolog\Handler\RotatingFileHandler;
+use Monolog\Formatter\LineFormatter;
 
 class Main
 {
     const NAME = 'acelle/aws-whitelabel';
-    protected $data;
 
     public function __construct()
     {
         //
+    }
+
+    public function logger()
+    {
+        $formatter = new LineFormatter("[%datetime%] %channel%.%level_name%: %message%\n");
+
+        $logfile = storage_path('logs/' . php_sapi_name() . '/aws-whitelabel.log');
+        $stream = new RotatingFileHandler($logfile, 0, Logger::DEBUG);
+        $stream->setFormatter($formatter);
+
+        $pid = getmypid();
+        $logger = new Logger($pid);
+        $logger->pushHandler($stream);
+
+        return $logger;
     }
 
     public function getDbRecord()
@@ -34,6 +52,15 @@ class Main
             return view('awswhitelabel::notification', [
                 'server' => $server,
             ]);
+        });
+
+        Hook::register('after_verify_dkim_against_aws_ses', function ($domain, $tokens) {
+            $this->logger()->info("Start generating proxy DNS for {$domain}");
+            foreach ($tokens as $subname) {
+                $this->logger()->info("- {$subname} for {$domain}");
+                $this->changeResourceRecordSets($subname, $domain);
+                $this->logger()->info("==> {$subname} for {$domain} DONE");
+            }
         });
 
         Hook::register('activate_plugin_'.self::NAME, function () {
@@ -60,13 +87,6 @@ class Main
             $dkims[$i] = $dkim;
         }
         $spf = null;
-    }
-
-    public function createCnameRecords($server, $domain, $tokens)
-    {
-        foreach ($tokens as $subname) {
-            $this->changeResourceRecordSets($subname, $domain);
-        }
     }
 
     public function getRoute53Client()
@@ -96,30 +116,18 @@ class Main
         return $client;
     }
 
-    /*
-    public function getRoute53DomainClient($server)
+    private function changeResourceRecordSets($subname)
     {
-        $client = Route53DomainsClient::factory(array(
-            'credentials' => array(
-                'key' => trim($server->aws_access_key_id),
-                'secret' => trim($server->aws_secret_access_key),
-            ),
-            'region' => $server->aws_region,
-            'version' => '2014-05-15',
-        ));
+        $data = $this->getDbRecord()->getData();
+        $brandDomain = $data['domain'];
+        $hostedzone = $data['zone'];
 
-        return $client;
-    }
-    */
-
-    private function changeResourceRecordSets($subname, $domain)
-    {
         // foo.example.com. CNAME foo.amazon.dkim.amazonses.com
-        $name = "{$subname}.dkim.{$domain}.";
+        $name = "{$subname}.dkim.{$brandDomain}";
         $value = "{$subname}.dkim.amazonses.com";
-        $hostedZoneId = 'Z01341112AVEFK3WADVQQ';
+
         $result = $this->getRoute53Client()->changeResourceRecordSets([
-            'HostedZoneId' => $hostedZoneId,
+            'HostedZoneId' => $hostedzone,
             'ChangeBatch' => array(
                 'Comment' => 'string',
                 'Changes' => array(

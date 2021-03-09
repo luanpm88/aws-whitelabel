@@ -7,7 +7,7 @@
         brand.to from Route S3.',
     'plugin.setting.updated' => 'The setting was updated',
     'whitelabel.title' => 'Whitelable AWS so that it serves under your own brand',
-    'whitelabel.wording' => 'When user add a sending domain, they shall be required to add DNS record like amazon.domain.com
+    'whitelabel.wording' => 'When user adds a sending domain, they shall be required to add DNS records like amazon.domain.com
         to their DNS management control. You can replace `amazoneses` with something line awsome.domain.com to make it your
         own brand
     ',
@@ -26,11 +26,10 @@
         required to add DNS
         record of your own
         brand
-        <strong>:selector</strong>
+        <strong>:domain</strong>
         to their DNS
         management
-        control. No AWS selector or
-        message id shall show up to your users',
+        control. No AWS related information shall show up to your users',
     'whitelabel.settings' => 'Settings',
     'whitelabel.turn_off' => 'Turn OFF whitelabelling',
     'whitelable.turned_off' => 'Whitelablling was successfully turned off',

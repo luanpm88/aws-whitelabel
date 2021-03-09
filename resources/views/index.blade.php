@@ -4,7 +4,6 @@
 
 @section('page_script')
     <script type="text/javascript" src="{{ URL::asset('assets/js/plugins/forms/styling/uniform.min.js') }}"></script>
-    <script type="text/javascript" src="{{ URL::asset('js/validate.js') }}"></script>
 @endsection
 
 @section('page_header')
@@ -16,7 +15,7 @@
         </ul>
         <div class="d-flex align-items-center">
             <div class="mr-4">
-                <img width="80px" height="80px" src="{{ url('/images/plugin.svg') }}" />
+                <img width="80px" height="80px" src="{{ $plugin->getIconUrl() ? $plugin->getIconUrl() : url('/images/plugin.svg') }}" />
             </div>
             <div>
                 <h1 class="mt-0 mb-2">

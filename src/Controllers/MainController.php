@@ -155,45 +155,12 @@ class MainController extends Controller
      */
     public function connection(Request $request, $uid)
     {
-        $server = SendingServer::findByUid($uid);
-
-        // authorize
-        if (!$request->user()->admin->can('update', $server)) {
-            return $this->notAuthorized();
-        }
-
-        // validate and save posted data
-        if ($request->isMethod('post')) {
-            // make validator
-            $validator = \Validator::make($request->all(), [
-                'brand' => 'required',
-            ]);
-
-            // redirect if fails
-            if ($validator->fails()) {
-                return response()->view('awswhitelabel::popup', [
-                    'server' => $server,
-                    'errors' => $validator->errors(),
-                ], 400);
-            }
-            
-            // update plugin data
-            $plugin = \Acelle\Model\Plugin::getByName('acelle/aws-whitelabel');
-            $plugin->updateData([
-                $server->uid => $request->brand,
-            ]);
-
-            return response()->json([
-                'status' => 'success',
-                'message' => trans('messages.whitelable.updated'),
-            ]);
-        }
-
         $main = new Main();
         $record = $main->getDbRecord();
         return view('awswhitelabel::connection', [
-            'server' => $server,
             'plugin' => $record,
+            'domain' => $record->getData()['domain'],
+            'zone' => $record->getData()['zone'],
         ]);
     }
 

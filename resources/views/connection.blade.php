@@ -1,4 +1,4 @@
-@if($plugin->getData() && isset($plugin->getData()[$server->uid])) 
+@if ($plugin->isActive()) 
     <div class="quicktip d-flex" style="margin-left: 20px;">
         <div class="quicktip-icon"><svg version="1.1"
             id="svg30" inkscape:version="0.92.2 5c3e80d, 2017-08-06" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:svg="http://www.w3.org/2000/svg"
@@ -44,16 +44,12 @@
             <h3>{{ trans('awswhitelabel::messages.whitelabel.enabled.wording') }}</h3>
             <p>
                 {!! trans('awswhitelabel::messages.whitelabel.enabled.intro', [
-                    'selector' => $plugin->getData()[$server->uid],
+                    'domain' => "$domain ($zone)",
                 ]) !!}
             </p>
             <a href="{{ action("\Acelle\Plugin\AwsWhitelabel\Controllers\MainController@index") }}"
                 class="btn btn-mc_primary btn-outline">
                 {{ trans('awswhitelabel::messages.whitelabel.settings') }}
-            </a>
-            <a href="{{ action("\Acelle\Plugin\AwsWhitelabel\Controllers\MainController@turnOff", $server->uid) }}"
-                class="btn btn-mc_outline ml-2 whitelabel-off">
-                {{ trans('awswhitelabel::messages.whitelabel.turn_off') }}
             </a>
         </div>
     </div>
@@ -64,59 +60,10 @@
             <p>
                 {{ trans('awswhitelabel::messages.whitelabel.wording') }}
             </p>
-            <a href="{{ action("\Acelle\Plugin\AwsWhitelabel\Controllers\MainController@popup", $server->uid) }}"
+            <a href="{{ action("\Acelle\Plugin\AwsWhitelabel\Controllers\MainController@index") }}"
                 class="btn btn-mc_primary btn-outline whitelabel-button">
                 {{ trans('awswhitelabel::messages.whitelabel.enable') }}
             </a>
         </div>
     </div>
 @endif
-
-<script>
-    var whitelabelPopup = new Popup();
-
-    $('.whitelabel-button').on('click', function(e) {
-        e.preventDefault();
-
-        var url = $(this).attr('href');
-
-        whitelabelPopup.load(url);
-    });
-
-    $('.whitelabel-off').on('click', function(e) {
-        e.preventDefault();
-
-        var url = $(this).attr('href');
-
-        addMaskLoading();
-
-        // 
-        $.ajax({
-            url: url,
-            method: 'POST',
-            data: {
-                _token: CSRF_TOKEN,
-            },
-            globalError: false,
-            statusCode: {
-                // validate error
-                400: function (res) {
-                    whitelabelPopup.loadHtml(res.responseText);
-
-                    // remove masking
-                    removeMaskLoading();
-                }
-            },
-            success: function (response) {
-                removeMaskLoading();
-
-                // notify
-                notify(response.status, '{{ trans('messages.notify.success') }}', response.message); 
-
-                whitelabelPopup.hide();
-
-                whitelabelBox.load();
-            }
-        });
-    });
-</script>

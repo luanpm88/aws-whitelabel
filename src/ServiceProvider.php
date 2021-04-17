@@ -17,25 +17,11 @@ class ServiceProvider extends Base
         // Get the Plugin Main object
         $main = new Main();
 
-        $main->registerHooks();
-
-        /*
-
-        // The following is executed after
-        // Plugin::load('acelle/aws-whitelabel')
-
-        // Test hook execution
-        echo 'booted';
-        $identity = 1;
-        $dkims = [['value' => 'u83973948392438.dkim.amazonses.com']];
-        $spf = 1343;
-        Plugin::executeHook('filter_aws_ses_dns_records', [ &$identity, &$dkims, &$spf ]);
-
-        echo "$identity";
-        var_dump($dkims);
-        var_dump($spf);
-        die;
-        */
+        // Only register hook if plugin is active
+        // However, it is better that the host application controls this
+        if ($main->getDbRecord()->isActive()) {
+            $main->registerHooks();
+        }
 
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'awswhitelabel');
 

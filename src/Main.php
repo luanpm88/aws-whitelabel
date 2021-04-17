@@ -79,7 +79,9 @@ class Main
 
     public function removeAmazonSesBrand(&$identity, &$dkims, &$spf)
     {
-        $domain = 'acelle.link';
+        // $domain = 'acelle.link';
+        $data = $this->getDbRecord()->getData();
+        $domain = $data['domain'];
         $identity = null;
         for ($i = 0; $i < sizeof($dkims); $i += 1) {
             $dkim = $dkims[$i];

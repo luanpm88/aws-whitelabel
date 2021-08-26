@@ -1,4 +1,4 @@
-@extends('layouts.backend')
+@extends('layouts.core.backend')
 
 @section('title', trans('awswhitelabel::messages.aws_whitelabel_plugin'))
 

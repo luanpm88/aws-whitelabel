@@ -15,7 +15,7 @@ then
   echo "Error: directory does not exist" && exit 1
 fi
 
-APPNAME="postal"
+APPNAME="aws-whitelabel"
 VERSION=$(git tag --points-at HEAD)
 # VERSION=${VERSION:-"-latest"}
 

@@ -1,0 +1,73 @@
+/*
+ * AWS Whitelabel — status chip styling.
+ *
+ * Chip is fixed-positioned at the top-right of the viewport when present
+ * (the plugin only emits the chip on SES sending-server edit pages).
+ */
+
+.awswl-chip {
+    position: fixed;
+    top: 80px;
+    right: 24px;
+    z-index: 1040;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.awswl-chip:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.awswl-chip:focus {
+    outline: 2px solid rgba(0, 123, 255, 0.4);
+    outline-offset: 2px;
+}
+
+.awswl-chip--active {
+    background-color: #e6f9ed;
+    color: #0e6b3a;
+    border-color: #b6e8c7;
+}
+
+.awswl-chip--inactive {
+    background-color: #f1f3f5;
+    color: #6c757d;
+    border-color: #dee2e6;
+}
+
+.awswl-chip--info {
+    background-color: #e7f1ff;
+    color: #0c5fbf;
+    border-color: #b6d4fb;
+}
+
+.awswl-chip__icon {
+    font-size: 14px;
+    line-height: 1;
+}
+
+.awswl-chip__label {
+    white-space: nowrap;
+    max-width: 220px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@media (max-width: 768px) {
+    .awswl-chip {
+        top: auto;
+        bottom: 16px;
+        right: 16px;
+    }
+}

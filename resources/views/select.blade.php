@@ -1,91 +1,116 @@
-@extends('layouts.core.backend')
+@extends('refactor.layouts.admin')
 
 @section('title', trans('awswhitelabel::messages.aws_whitelabel_plugin'))
 
-@section('page_script')
-    <script type="text/javascript" src="{{ URL::asset('assets/js/plugins/forms/styling/uniform.min.js') }}"></script>
-    <script type="text/javascript" src="{{ URL::asset('js/validate.js') }}"></script>
-@endsection
-
-@section('page_header')
-
-    <div class="page-title">				
-        <ul class="breadcrumb breadcrumb-caret position-right">
-            <li><a href="{{ action("Admin\HomeController@index") }}">{{ trans('messages.home') }}</a></li>
-            <li><a href="{{ action("Admin\PluginController@index") }}">{{ trans('messages.plugins') }}</a></li>
-        </ul>
-        <div class="d-flex align-items-center">
-            <div class="mr-4">
-                <img width="80px" height="80px" src="{{ url('/images/plugin.svg') }}" />
-            </div>
-            <div>
-                <h1 class="mt-0 mb-2">
-                    {{ $plugin->title }}
-                </h1>
-                <p class="mb-1">
-                    {{ $plugin->description }}
-                </p>
-                <div class="text-muted">
-                    {{ trans('awswhitelabel::messages.version') }}: {{ $plugin->version }}
-                </div>
-            </div>		
-        </div>		
+@section('page-header')
+    <div class="mc-page-header">
+        <div>
+            <h1 class="mc-page-title">{{ $plugin->title }}</h1>
+            <p class="mc-page-subtitle">{{ $plugin->description }}</p>
+        </div>
     </div>
-
 @endsection
 
 @section('content')
-    
-    <div class="row">
-        <div class="col-md-6">
+@if (session('alert-error'))
+    <div class="mc-alert mc-alert-danger" style="margin-bottom:var(--space-3)">
+        <span class="material-symbols-rounded" aria-hidden="true">error</span>
+        {{ session('alert-error') }}
+    </div>
+@endif
+
+<div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:var(--space-5);align-items:start;">
+
+<div class="mc-card">
+    <div style="padding:var(--space-5);">
+        @if ($step)
+            <p style="margin:0 0 var(--space-3) 0;color:var(--color-text-muted);font-size:var(--text-sm);">
+                <strong>{{ trans('awswhitelabel::messages.wizard.step', ['n' => $step, 'total' => 2]) }}</strong>
+            </p>
+        @endif
+
+        <h2 style="margin:0 0 var(--space-2) 0;font-size:var(--text-lg);">{{ trans('awswhitelabel::messages.select.heading') }}</h2>
+        <p style="color:var(--color-text-muted);margin-bottom:var(--space-4);">{{ trans('awswhitelabel::messages.select.intro') }}</p>
+
+        @if (!empty($delegation) && !$delegation['delegated'])
+            <div class="mc-alert mc-alert-warning" style="margin-bottom:var(--space-4);">
+                <span class="material-symbols-rounded" aria-hidden="true">warning</span>
+                <div>
+                    <strong>{{ trans('awswhitelabel::messages.select.ns_warning_title') }}</strong>
+                    <p style="margin:var(--space-2) 0 0 0;">{!! trans('awswhitelabel::messages.select.ns_warning_body', ['domain' => '<code>'.e($currentZone).'</code>']) !!}</p>
+                    <details style="margin-top:var(--space-2);">
+                        <summary style="cursor:pointer;color:var(--color-text-muted);font-size:var(--text-sm);">{{ trans('awswhitelabel::messages.select.ns_warning_diag') }}</summary>
+                        <div style="margin-top:var(--space-2);font-size:var(--text-sm);">
+                            <strong>{{ trans('awswhitelabel::messages.select.ns_route53') }}:</strong>
+                            <ul style="margin:var(--space-1) 0 var(--space-2) var(--space-3);padding:0;">
+                                @foreach ($delegation['route53_ns'] as $ns)
+                                    <li><code>{{ $ns }}</code></li>
+                                @endforeach
+                            </ul>
+                            <strong>{{ trans('awswhitelabel::messages.select.ns_public') }}:</strong>
+                            @if (empty($delegation['public_ns']))
+                                <p style="margin:var(--space-1) 0 0 0;color:var(--color-text-muted);">{{ trans('awswhitelabel::messages.select.ns_public_empty') }}</p>
+                            @else
+                                <ul style="margin:var(--space-1) 0 0 var(--space-3);padding:0;">
+                                    @foreach ($delegation['public_ns'] as $ns)
+                                        <li><code>{{ $ns }}</code></li>
+                                    @endforeach
+                                </ul>
+                            @endif
+                        </div>
+                    </details>
+                </div>
+            </div>
+        @endif
+
+        @if (empty($domains))
+            <div class="mc-alert mc-alert-warning" style="margin-bottom:var(--space-3);">
+                <span class="material-symbols-rounded" aria-hidden="true">warning</span>
+                {{ trans('awswhitelabel::messages.select.no_zones') }}
+            </div>
+            <a href="{{ action('\Acelle\Plugin\AwsWhitelabel\Controllers\MainController@editKey') }}" class="mc-btn mc-btn-default">
+                {{ trans('awswhitelabel::messages.action.edit_credentials') }}
+            </a>
+        @else
             <form method="POST" action="{{ action('\Acelle\Plugin\AwsWhitelabel\Controllers\MainController@saveDomain') }}">
-                {{ csrf_field() }}
-                <p>
-                    {{ trans('awswhitelabel::messages.whitelabel.choose_brand.wording') }}
-                </p>
-                <!--
-                <div class="row mb-4">
-                    <div class="col-md-12 pr-0 form-groups-bottom-0">
-                        @include('helpers.form_control', [
-                            'type' => 'text',
-                            'class' => '',
-                            'label' => 'AWS key',
-                            'name' => 'aws_key',
-                            'value' => isset($data['aws_key']) ? $data['aws_key'] : null,
-                            'help_class' => 'aws_key',
-                            'rules' => ['aws_key' => 'required']
-                        ])
-                    </div>
-                </div>
-                <div class="row mb-4">
-                    <div class="col-md-12 pr-0 form-groups-bottom-0">
-                        @include('helpers.form_control', [
-                            'type' => 'text',
-                            'class' => '',
-                            'label' => 'AWS secret',
-                            'name' => 'aws_secret',
-                            'value' => isset($data['aws_secret']) ? $data['aws_secret'] : null,
-                            'help_class' => 'aws_secret',
-                            'rules' => ['aws_secret' => 'required']
-                        ])
-                    </div>
-                </div>
-                -->
-                <div class="row mb-4">
-                    <div class="col-md-12 pr-0 form-groups-bottom-0">
-                        <p>Select a domain for using as brand domain</p>
-                        <select name="domain">
-                            @foreach ($domains as $domain)
-                            <option value="{{ $domain['name'] }}|{{ $domain['zone'] }}">{{ $domain['name'] }} (Zone: {{ $domain['zone'] }})</option>
-                            @endforeach
-                        </select>
-                    </div>
+                @csrf
+
+                @if ($currentZone)
+                    <p style="color:var(--color-text-muted);font-size:var(--text-sm);margin:0 0 var(--space-2) 0;">
+                        {{ trans('awswhitelabel::messages.select.current_zone', ['zone' => $currentZone]) }}
+                    </p>
+                @endif
+
+                <div style="margin-bottom:var(--space-5);">
+                    <label for="awswl-domain" class="mc-form-label">{{ trans('awswhitelabel::messages.select.label') }}</label>
+                    <select name="domain" id="awswl-domain" class="mc-form-input" required>
+                        @foreach ($domains as $domain)
+                            <option value="{{ $domain['name'] }}|{{ $domain['zone'] }}" @if ($currentZone === $domain['zone']) selected @endif>
+                                {{ $domain['name'] }} (Zone: {{ $domain['zone'] }})
+                            </option>
+                        @endforeach
+                    </select>
+                    <p style="color:var(--color-text-muted);font-size:var(--text-sm);margin:var(--space-1) 0 0 0;">
+                        {{ trans('awswhitelabel::messages.select.help') }}
+                    </p>
                 </div>
 
-                <div class=" mt-4">
-                    <input type="submit" value="Save">
+                <div style="display:flex;gap:var(--space-2);">
+                    <button type="submit" class="mc-btn mc-btn-primary">
+                        <span class="material-symbols-rounded" aria-hidden="true">check</span>
+                        {{ trans('awswhitelabel::messages.select.save') }}
+                    </button>
+                    <a href="{{ action('\Acelle\Plugin\AwsWhitelabel\Controllers\MainController@index') }}" class="mc-btn mc-btn-ghost">
+                        {{ trans('messages.cancel') }}
+                    </a>
                 </div>
             </form>
-        </div>
+        @endif
     </div>
+</div>
+
+    {{-- RIGHT: zone-pick guideline --}}
+    @include('awswhitelabel::_guideline_select')
+
+</div>
 @endsection

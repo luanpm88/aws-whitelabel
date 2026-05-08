@@ -1,9 +1,9 @@
 {
-    "name": "acelle/aws-whitelabel",
+    "name": "acelle/awswhitelabel",
     "title": "AWS Whitelabel Plugin For Acelle",
-    "version": "1.0.3",
-    "app_version": "4.0.24-p103",
-    "description": "Remove AWS brand in your Acelle application",
+    "version": "2.0.0",
+    "app_version": "4.2.0-p29",
+    "description": "Hide AWS SES branding on customer-facing DKIM records by chaining CNAMEs through your own Route53-hosted brand domain.",
     "authors": [
         {
             "name": "Basic Technology Software Co., Ltd.",

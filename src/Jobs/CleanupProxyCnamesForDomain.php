@@ -14,7 +14,7 @@ use Illuminate\Queue\SerializesModels;
  * deleted by the customer. Per-token DELETE so a single record mismatch
  * (TTL drift / manually edited) does not kill the whole batch.
  *
- * Dispatched from the SendingDomain::deleting Eloquent listener registered
+ * Dispatched from the SendingIdentity::deleting Eloquent listener registered
  * in ServiceProvider::boot().
  */
 class CleanupProxyCnamesForDomain implements ShouldQueue

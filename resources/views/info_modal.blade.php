@@ -25,7 +25,7 @@
             <div class="modal-body">
                 <p>{!! trans('awswhitelabel::messages.info_modal.intro', [
                     'brand' => '<strong>'.e($brand).'</strong>',
-                    'domain' => '<code>'.e($sendingDomain->name).'</code>',
+                    'domain' => '<code>'.e($identity->value).'</code>',
                 ]) !!}</p>
                 <p class="text-muted small mb-0">
                     {{ trans('awswhitelabel::messages.info_modal.note') }}

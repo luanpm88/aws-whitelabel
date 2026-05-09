@@ -447,12 +447,12 @@ class Main
 
     /**
      * Detect: is the current request the customer-facing DNS records page
-     * for a sending domain owned by an SES sending server? Returns the
-     * SendingDomain when yes, null otherwise. Used by the layout.body.before_close
+     * for a sending identity owned by an SES sending server? Returns the
+     * SendingIdentity when yes, null otherwise. Used by the layout.body.before_close
      * hook to gate the customer-facing info chip + modal render — explains
      * to the customer that their DKIM CNAMEs are proxied via the brand domain.
      */
-    public function detectSesSendingDomain(): ?\App\Model\SendingDomain
+    public function detectSesSendingDomain(): ?\App\Model\SendingIdentity
     {
         $route = request()->route();
         if ($route?->getName() !== 'refactor.sending.domain_records') {
@@ -464,26 +464,27 @@ class Main
             return null;
         }
 
-        $sendingDomain = \App\Model\SendingDomain::findByUid($uid);
-        if (!$sendingDomain) {
+        $identity = \App\Model\SendingIdentity::query()->where('uid', $uid)->first();
+        if (!$identity) {
             return null;
         }
 
-        // Only show the chip when the domain's tokens look like SES DKIM
+        // Only show the chip when the identity's DKIM records look like SES
         // (CNAME records pointing at amazonses.com). STANDARD-vendor domains
         // produce TXT-style DKIM and have nothing to do with whitelabelling.
-        $tokens = $sendingDomain->getVerificationTokens();
-        if (!is_array($tokens) || empty($tokens['dkim'])) {
-            return null;
+        $hasSesDkim = false;
+        foreach ($identity->recordsByPurpose(\App\SendingServers\DomainVerification\RecordPurpose::DKIM) as $r) {
+            if (strtoupper($r->type) === 'CNAME'
+                && is_string($r->value)
+                && str_contains($r->value, '.dkim.amazonses.com')) {
+                $hasSesDkim = true;
+                break;
+            }
         }
-        $hasSesDkim = collect($tokens['dkim'])->contains(
-            fn ($d) => ($d['type'] ?? null) === 'CNAME'
-                && str_contains($d['value'] ?? '', '.dkim.amazonses.com')
-        );
         if (!$hasSesDkim) {
             return null;
         }
 
-        return $sendingDomain;
+        return $identity;
     }
 }

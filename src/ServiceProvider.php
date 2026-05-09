@@ -4,7 +4,9 @@ namespace Acelle\Plugin\AwsWhitelabel;
 
 use Acelle\Plugin\AwsWhitelabel\Jobs\CleanupProxyCnamesForDomain;
 use App\Library\Facades\Hook;
-use App\Model\SendingDomain;
+use App\Model\SendingIdentity;
+use App\SendingServers\DomainVerification\RecordPurpose;
+use App\SendingServers\Identities\IdentityKind;
 use Illuminate\Support\ServiceProvider as Base;
 
 class ServiceProvider extends Base
@@ -98,13 +100,13 @@ class ServiceProvider extends Base
                 ])->render();
             }
 
-            if ($sendingDomain = $main->detectSesSendingDomain()) {
+            if ($identity = $main->detectSesSendingDomain()) {
                 if (!$main->isFullyConfigured()) {
                     return null;
                 }
                 return view('awswhitelabel::info_modal', [
-                    'sendingDomain' => $sendingDomain,
-                    'plugin' => $main->getDbRecord(),
+                    'identity' => $identity,
+                    'plugin'   => $main->getDbRecord(),
                 ])->render();
             }
 
@@ -122,25 +124,24 @@ class ServiceProvider extends Base
         // proxy CNAMEs we wrote into the brand zone for that domain's DKIM
         // tokens become orphans. Dispatch an async DELETE so customer's
         // request doesn't block on Route53 + plugin can fail-isolated.
-        SendingDomain::deleting(function (SendingDomain $sendingDomain) use ($main) {
+        SendingIdentity::deleting(function (SendingIdentity $identity) use ($main) {
             if (!$main->isFullyConfigured()) {
                 return;
             }
-
-            $tokens = $sendingDomain->getVerificationTokens();
-            if (!is_array($tokens) || empty($tokens['dkim'])) {
+            if ($identity->kind !== IdentityKind::DOMAIN) {
                 return;
             }
 
-            // Extract SES DKIM token prefixes from records of shape
-            //   ['type'=>'CNAME', 'name'=>'tok._domainkey.X', 'value'=>'tok.dkim.amazonses.com']
-            // Skip non-AWS DKIM (eg. STANDARD vendor uses TXT records).
+            // Extract SES DKIM token prefixes from records.
+            // Records of purpose=DKIM with CNAME type and value like
+            //   tok.dkim.amazonses.com
+            // — skip non-AWS DKIM (eg. STANDARD vendor uses TXT records).
             $tokenList = [];
-            foreach ($tokens['dkim'] as $dkim) {
-                if (($dkim['type'] ?? null) !== 'CNAME') {
+            foreach ($identity->recordsByPurpose(RecordPurpose::DKIM) as $r) {
+                if (strtoupper($r->type) !== 'CNAME') {
                     continue;
                 }
-                if (preg_match('/^([A-Za-z0-9]+)\.dkim\.amazonses\.com$/', $dkim['value'] ?? '', $m)) {
+                if (preg_match('/^([A-Za-z0-9]+)\.dkim\.amazonses\.com$/', $r->value ?? '', $m)) {
                     $tokenList[] = $m[1];
                 }
             }
@@ -149,7 +150,7 @@ class ServiceProvider extends Base
                 return;
             }
 
-            CleanupProxyCnamesForDomain::dispatch($sendingDomain->name, $tokenList);
+            CleanupProxyCnamesForDomain::dispatch($identity->value, $tokenList);
         });
     }
 }

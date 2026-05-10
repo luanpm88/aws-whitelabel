@@ -1,6 +1,6 @@
 {
     "name": "acelle/awswhitelabel",
-    "title": "AWS Whitelabel Plugin For Acelle",
+    "title": "AWS Whitelabel",
     "version": "2.0.3",
     "app_version": "4.2.0-p68",
     "description": "Hide AWS SES branding on customer-facing DKIM records by chaining CNAMEs through your own Route53-hosted brand domain.",
